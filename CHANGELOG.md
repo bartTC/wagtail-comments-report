@@ -7,6 +7,8 @@ uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [1.0.0] — 2026-05-08
+
 ### Added
 
 - **Comments** entry under **Reports** in the Wagtail admin listing
@@ -23,4 +25,5 @@ uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   shown. Implemented with cross-database-portable `Max("id")`
   aggregation, so the package works on both Postgres and SQLite.
 
-[Unreleased]: https://github.com/bartTC/wagtail-comments-report/commits/main
+[Unreleased]: https://github.com/bartTC/wagtail-comments-report/compare/v1.0.0...HEAD
+[1.0.0]: https://github.com/bartTC/wagtail-comments-report/releases/tag/v1.0.0

@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "wagtail-comments-report"
-version = "0.1.0"
+version = "1.0.0"
 description = "A Wagtail admin report listing every page comment in one place."
 readme = "README.md"
 license = { text = "MIT" }
