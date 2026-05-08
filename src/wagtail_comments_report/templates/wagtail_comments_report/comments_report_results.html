@@ -1,0 +1,50 @@
+{% extends 'wagtailadmin/reports/base_report_results.html' %}
+{% load i18n wagtailadmin_tags %}
+
+{% block results %}
+    <table class="listing">
+        <colgroup>
+            <col style="width: 50%;">
+            <col style="width: 22%;">
+            <col style="width: 12%;">
+            <col style="width: 8%;">
+            <col style="width: 8%;">
+        </colgroup>
+        <thead>
+            <tr>
+                <th>{% trans 'Comment' %}</th>
+                <th>{% trans 'Page' %}</th>
+                <th>{% trans 'Author' %}</th>
+                <th class="updated">{% trans 'Date' %}</th>
+                <th>{% trans 'Status' %}</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for comment in object_list %}
+                <tr>
+                    <td>{{ comment.text|linebreaksbr }}</td>
+                    <td>
+                        <a href="{% url 'wagtailadmin_pages:edit' comment.page_id %}">
+                            {{ comment.page.specific_deferred.get_admin_display_title }}
+                        </a>
+                    </td>
+                    <td>
+                        {% include "wagtailadmin/shared/user_avatar.html" with user=comment.user %}
+                    </td>
+                    <td class="updated" style="white-space: nowrap;">{% human_readable_date comment.created_at %}</td>
+                    <td>
+                        {% if comment.resolved_at %}
+                            {% status _("Resolved") classname="w-status--primary" %}
+                        {% else %}
+                            {% status _("Open") %}
+                        {% endif %}
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}
+
+{% block no_results_message %}
+    <p>{% trans "No comments found." %}</p>
+{% endblock %}

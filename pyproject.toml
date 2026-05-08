@@ -1,0 +1,126 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "wagtail-comments-report"
+version = "0.1.0"
+description = "A Wagtail admin report listing every page comment in one place."
+readme = "README.md"
+license = { text = "MIT" }
+requires-python = ">=3.9"
+authors = [
+    { name = "Martin Mahner", email = "martin@elephant.house" },
+]
+keywords = ["wagtail", "django", "comments", "report", "admin"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Environment :: Web Environment",
+    "Framework :: Django",
+    "Framework :: Wagtail",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3 :: Only",
+    "Topic :: Internet :: WWW/HTTP :: Dynamic Content :: Content Management System",
+]
+# Loose pins on purpose: the Hatch test matrix below covers what we
+# actually exercise. Users on older Django/Wagtail can install at their own
+# risk — pip resolves whatever's compatible.
+dependencies = [
+    "Django",
+    "Wagtail",
+    "django-filter",
+]
+
+[project.optional-dependencies]
+test = [
+    "pytest>=8.0",
+    "pytest-django>=4.8",
+]
+
+[project.urls]
+Homepage = "https://github.com/bartTC/wagtail-comments-report"
+Issues = "https://github.com/bartTC/wagtail-comments-report/issues"
+Changelog = "https://github.com/bartTC/wagtail-comments-report/blob/main/CHANGELOG.md"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/wagtail_comments_report"]
+
+[tool.hatch.build.targets.sdist]
+include = [
+    "src/wagtail_comments_report",
+    "README.md",
+    "LICENSE",
+    "pyproject.toml",
+]
+
+[tool.pytest.ini_options]
+DJANGO_SETTINGS_MODULE = "tests.settings"
+pythonpath = ["src"]
+testpaths = ["src/tests"]
+addopts = "-ra"
+
+# -----------------------------------------------------------------------------
+# Hatch test matrix
+#
+# `hatch test --all` iterates over every cell defined below.
+# Three sub-matrices instead of one cross-product, because not every
+# combination is supported upstream:
+#
+#   - Wagtail 6.x dropped Django 6 (only Wagtail 7+ supports it).
+#   - Django 6 requires Python 3.12+.
+#   - Wagtail 6 only supports Django 5.2 from the 6.4 release on.
+# -----------------------------------------------------------------------------
+[tool.hatch.envs.hatch-test]
+installer = "uv"
+extra-dependencies = ["pytest-django>=4.8"]
+default-args = ["src/"]
+
+# Wagtail 6.4+ × Django 5.2 × Python 3.10–3.13
+[[tool.hatch.envs.hatch-test.matrix]]
+python = ["3.10", "3.11", "3.12", "3.13"]
+django = ["5.2"]
+wagtail = ["6"]
+
+# Wagtail 7 × Django 5.2 × Python 3.10–3.14
+[[tool.hatch.envs.hatch-test.matrix]]
+python = ["3.10", "3.11", "3.12", "3.13", "3.14"]
+django = ["5.2"]
+wagtail = ["7"]
+
+# Wagtail 7 × Django 6.0 × Python 3.12–3.14  (Django 6 needs Python 3.12+)
+[[tool.hatch.envs.hatch-test.matrix]]
+python = ["3.12", "3.13", "3.14"]
+django = ["6.0"]
+wagtail = ["7"]
+
+[tool.hatch.envs.hatch-test.overrides]
+matrix.django.dependencies = [
+    { value = "django~=5.2.0", if = ["5.2"] },
+    { value = "django~=6.0.0", if = ["6.0"] },
+]
+matrix.wagtail.dependencies = [
+    { value = "wagtail>=6.4,<7", if = ["6"] },
+    { value = "wagtail>=7,<8", if = ["7"] },
+]
+
+[tool.ruff]
+target-version = "py310"
+lint.select = ["ALL"]
+lint.ignore = [
+    "COM812", # Conflicts with ruff format
+    "E501", # Line too long (>88)
+    "D203", # incorrect-blank-line-before-class (conflicts with D211)
+    "D212", # Don't require summary on first line
+    "ERA001", # Found commented-out code
+    "FBT", # Flake Boolean Trap (don't use arg=True in functions)
+]
+
+[tool.ruff.lint.extend-per-file-ignores]
+"test*.py" = [
+    "S101", # Use of `assert` detected
+    "PLR2004", # Magic value used in comparison, consider replacing <int> with a constant variable
+]
